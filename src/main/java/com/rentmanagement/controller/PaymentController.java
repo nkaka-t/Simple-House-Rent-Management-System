@@ -1,5 +1,6 @@
 package com.rentmanagement.controller;
 
+import com.rentmanagement.dto.request.PaymentRequest;
 import com.rentmanagement.dto.response.DebtSummaryResponse;
 import com.rentmanagement.dto.response.MonthlyRentSummaryResponse;
 import com.rentmanagement.dto.response.PaymentResponse;
@@ -17,6 +18,36 @@ import java.util.List;
 public class PaymentController {
 
     private final PaymentService paymentService;
+
+    @PostMapping
+    public ResponseEntity<PaymentResponse> createPayment(@RequestBody PaymentRequest request) {
+        PaymentResponse response = paymentService.createPayment(request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PaymentResponse>> getAllPayments() {
+        List<PaymentResponse> payments = paymentService.getAllPayments();
+        return ResponseEntity.ok(payments);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentResponse> getPaymentById(@PathVariable Long id) {
+        PaymentResponse payment = paymentService.getPaymentById(id);
+        return ResponseEntity.ok(payment);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PaymentResponse> updatePayment(@PathVariable Long id, @RequestBody PaymentRequest request) {
+        PaymentResponse response = paymentService.updatePayment(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
+        paymentService.deletePayment(id);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/generate/{tenantId}")
     public ResponseEntity<PaymentResponse> generateMonthlyRent(

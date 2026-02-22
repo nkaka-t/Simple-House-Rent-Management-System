@@ -13,7 +13,7 @@ Since Chocolatey is not available, you'll need to install the components manuall
 - Go to: https://adoptium.net/temurin/releases/?version=17
 - Select: Windows x64 (for 64-bit Windows)
 - Download: `OpenJDK17U-jdk_x64_windows_hotspot_XX.X.X.XX.zip`
-
+    
 **Step 2: Install Java 17**
 - Extract the zip file to: `C:\Program Files\Eclipse Adoptium\jdk-17.0.x-hotspot`
 - If "Program Files" folder doesn't exist, create it first

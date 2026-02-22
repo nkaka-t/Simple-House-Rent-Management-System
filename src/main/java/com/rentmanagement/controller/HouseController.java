@@ -44,6 +44,12 @@ public class HouseController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/{houseId}")
+    public ResponseEntity<HouseResponse> getHouseById(@PathVariable Long houseId) {
+        HouseResponse response = houseService.getHouseById(houseId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/vacant")
     public ResponseEntity<List<HouseResponse>> getVacantHouses() {
         List<HouseResponse> vacantHouses = houseService.getVacantHouses();

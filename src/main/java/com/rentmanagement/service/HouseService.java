@@ -93,6 +93,12 @@ public class HouseService {
         return convertToResponse(savedHouse);
     }
 
+    public HouseResponse getHouseById(Long houseId) {
+        House house = houseRepository.findById(houseId)
+                .orElseThrow(() -> new ResourceNotFoundException("House not found with id: " + houseId));
+        return convertToResponse(house);
+    }
+
     public List<HouseResponse> getVacantHouses() {
         return houseRepository.findByStatus(HouseStatus.VACANT)
                 .stream()

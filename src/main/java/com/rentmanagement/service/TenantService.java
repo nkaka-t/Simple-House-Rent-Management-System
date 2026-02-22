@@ -43,6 +43,28 @@ public class TenantService {
                 .collect(Collectors.toList());
     }
 
+    public TenantResponse getTenantById(Long tenantId) {
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with id: " + tenantId));
+        return convertToResponse(tenant);
+    }
+
+    @Transactional
+    public TenantResponse updateTenant(Long tenantId, TenantRequest request) {
+        Tenant existingTenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with id: " + tenantId));
+
+        existingTenant.setFullName(request.getFullName());
+        existingTenant.setPhone(request.getPhone());
+        existingTenant.setEmail(request.getEmail());
+        existingTenant.setNationalId(request.getNationalId());
+        existingTenant.setStartDate(request.getStartDate());
+        existingTenant.setEndDate(request.getEndDate());
+
+        Tenant updatedTenant = tenantRepository.save(existingTenant);
+        return convertToResponse(updatedTenant);
+    }
+
     @Transactional
     public TenantResponse tenantLeavesHouse(Long tenantId) {
         Tenant tenant = tenantRepository.findById(tenantId)

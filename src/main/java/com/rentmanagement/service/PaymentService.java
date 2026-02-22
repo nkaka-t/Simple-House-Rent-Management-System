@@ -19,6 +19,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.rentmanagement.dto.request.PaymentRequest;
+
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -90,6 +92,75 @@ public class PaymentService {
         return unpaidPayments.stream()
                 .map(Payment::getAmount)
                 .reduce(0.0, Double::sum);
+    }
+
+    public List<PaymentResponse> getAllPayments() {
+        return paymentRepository.findAll()
+                .stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public PaymentResponse getPaymentById(Long id) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + id));
+        return convertToResponse(payment);
+    }
+
+    @Transactional
+    public PaymentResponse createPayment(PaymentRequest request) {
+        Tenant tenant = tenantRepository.findById(request.getTenantId())
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with id: " + request.getTenantId()));
+
+        House house = tenant.getHouse();
+        if (house == null) {
+            throw new BusinessLogicException("Tenant is not assigned to any house");
+        }
+
+        Payment payment = new Payment();
+        payment.setMonth(request.getMonth());
+        payment.setYear(request.getYear());
+        payment.setAmount(request.getAmount());
+        payment.setStatus(request.getStatus() != null ? request.getStatus() : PaymentStatus.UNPAID);
+        payment.setPaymentDate(request.getPaymentDate());
+        payment.setTenant(tenant);
+        payment.setHouse(house);
+
+        Payment savedPayment = paymentRepository.save(payment);
+        return convertToResponse(savedPayment);
+    }
+
+    @Transactional
+    public PaymentResponse updatePayment(Long id, PaymentRequest request) {
+        Payment existingPayment = paymentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + id));
+
+        Tenant tenant = tenantRepository.findById(request.getTenantId())
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant not found with id: " + request.getTenantId()));
+
+        House house = tenant.getHouse();
+        if (house == null) {
+            throw new BusinessLogicException("Tenant is not assigned to any house");
+        }
+
+        existingPayment.setMonth(request.getMonth());
+        existingPayment.setYear(request.getYear());
+        existingPayment.setAmount(request.getAmount());
+        existingPayment.setStatus(request.getStatus());
+        existingPayment.setPaymentDate(request.getPaymentDate());
+        existingPayment.setTenant(tenant);
+        existingPayment.setHouse(house);
+
+        Payment updatedPayment = paymentRepository.save(existingPayment);
+        return convertToResponse(updatedPayment);
+    }
+
+    @Transactional
+    public void deletePayment(Long id) {
+        if (!paymentRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Payment not found with id: " + id);
+        }
+        paymentRepository.deleteById(id);
     }
 
     public MonthlyRentSummaryResponse monthlyRentSummary(Integer month, Integer year) {

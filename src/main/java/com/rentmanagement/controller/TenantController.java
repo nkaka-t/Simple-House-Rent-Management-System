@@ -30,6 +30,18 @@ public class TenantController {
         return ResponseEntity.ok(tenants);
     }
 
+    @GetMapping("/{tenantId}")
+    public ResponseEntity<TenantResponse> getTenantById(@PathVariable Long tenantId) {
+        TenantResponse response = tenantService.getTenantById(tenantId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{tenantId}")
+    public ResponseEntity<TenantResponse> updateTenant(@PathVariable Long tenantId, @RequestBody TenantRequest request) {
+        TenantResponse response = tenantService.updateTenant(tenantId, request);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/{tenantId}/leave")
     public ResponseEntity<TenantResponse> tenantLeavesHouse(@PathVariable Long tenantId) {
         TenantResponse response = tenantService.tenantLeavesHouse(tenantId);
